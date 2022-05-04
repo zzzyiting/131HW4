@@ -419,8 +419,10 @@ train/data</code></pre>
   step_impute_linear(age) %&gt;% 
   step_dummy(all_nominal_predictors()) %&gt;% 
   step_interact(~ starts_with(&quot;sex&quot;):fare + age:fare)</code></pre>
-<p>we can verify the number of observations was split correctly. ###
-Question 2</p>
+<p>we can verify the number of observations was split correctly.</p>
+</div>
+<div id="question-2" class="section level3">
+<h3>Question 2</h3>
 <p>Fold the <strong>training</strong> data. Use <em>k</em>-fold
 cross-validation, with <span class="math inline">\(k = 10\)</span>.</p>
 <pre class="r"><code>titanic_folds &lt;- vfold_cv(titanic_train, v = 10)
@@ -471,24 +473,23 @@ engine.</li>
 <p>How many models, total, across all folds, will you be fitting to the
 data? To answer, think about how many folds there are, and how many
 models you’ll fit to each fold.</p>
-<p>There will be 30 models I am fitting, there are 10 folds for each
-engine and there are 3 different engine.</p>
-<pre class="r"><code>log_reg &lt;- logistic_reg() %&gt;% 
+<pre class="r"><code># logistic regression with glm engine
+log_reg &lt;- logistic_reg() %&gt;% 
   set_engine(&quot;glm&quot;) %&gt;% 
   set_mode(&quot;classification&quot;)
 
 log_wkflow &lt;- workflow() %&gt;% 
   add_model(log_reg) %&gt;% 
-  add_recipe(titanic_recipe)
-
+  add_recipe(titanic_recipe)</code></pre>
+<pre class="r"><code># linear discriminant analysis with MASS engine
 lda_mod &lt;- discrim_linear() %&gt;% 
   set_engine(&quot;MASS&quot;) %&gt;% 
   set_mode(&quot;classification&quot;)
 
 lda_wkflow &lt;- workflow() %&gt;% 
   add_model(lda_mod) %&gt;% 
-  add_recipe(titanic_recipe)
-
+  add_recipe(titanic_recipe)</code></pre>
+<pre class="r"><code># a quadratic discriminant analysis with MASS engine
 qda_mod  &lt;- discrim_quad() %&gt;% 
   set_engine(&quot;MASS&quot;) %&gt;% 
   set_mode(&quot;classification&quot;)
@@ -496,15 +497,20 @@ qda_mod  &lt;- discrim_quad() %&gt;%
 qda_wkflow &lt;- workflow() %&gt;% 
   add_model(qda_mod) %&gt;% 
   add_recipe(titanic_recipe)</code></pre>
+<p>There will be 30 models I am fitting, there are 10 folds for each
+engine and there are 3 different engine.</p>
 </div>
 <div id="question-5" class="section level3">
 <h3>Question 5</h3>
 <p>Fit each of the models created in Question 4 to the folded data.</p>
-<pre class="r"><code>log_res &lt;- log_wkflow %&gt;% 
+<pre class="r"><code># logistic regression
+log_res &lt;- log_wkflow %&gt;% 
   fit_resamples(resamples = titanic_folds)</code></pre>
-<pre class="r"><code>lda_res &lt;- lda_wkflow %&gt;% 
+<pre class="r"><code># linear discriminant
+lda_res &lt;- lda_wkflow %&gt;% 
   fit_resamples(resamples = titanic_folds)</code></pre>
-<pre class="r"><code>qda_res &lt;- qda_wkflow %&gt;% 
+<pre class="r"><code># quadratic discriminant
+qda_res &lt;- qda_wkflow %&gt;% 
   fit_resamples(resamples = titanic_folds)</code></pre>
 </div>
 <div id="question-6" class="section level3">

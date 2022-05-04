@@ -2,7 +2,9 @@
 title: "Untitled"
 author: "Yiting Zhang"
 date: '2022-05-02'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -64,6 +66,7 @@ titanic_recipe <- recipe(survived ~ pclass + sex + age + sib_sp + parch + fare, 
   step_interact(~ starts_with("sex"):fare + age:fare)
 ```
 we can verify the number of observations was split correctly.
+
 ### Question 2
 
 Fold the **training** data. Use *k*-fold cross-validation, with $k = 10$.
@@ -92,10 +95,10 @@ Set up workflows for 3 models:
 
 How many models, total, across all folds, will you be fitting to the data? To answer, think about how many folds there are, and how many models you'll fit to each fold.
 
-There will be 30 models I am fitting, there are 10 folds for each engine and there are 3 different engine. 
+
 
 ```{r}
-
+# logistic regression with glm engine
 log_reg <- logistic_reg() %>% 
   set_engine("glm") %>% 
   set_mode("classification")
@@ -103,7 +106,10 @@ log_reg <- logistic_reg() %>%
 log_wkflow <- workflow() %>% 
   add_model(log_reg) %>% 
   add_recipe(titanic_recipe)
+```
 
+```{r}
+# linear discriminant analysis with MASS engine
 lda_mod <- discrim_linear() %>% 
   set_engine("MASS") %>% 
   set_mode("classification")
@@ -111,7 +117,11 @@ lda_mod <- discrim_linear() %>%
 lda_wkflow <- workflow() %>% 
   add_model(lda_mod) %>% 
   add_recipe(titanic_recipe)
+```
 
+
+```{r}
+# a quadratic discriminant analysis with MASS engine
 qda_mod  <- discrim_quad() %>% 
   set_engine("MASS") %>% 
   set_mode("classification")
@@ -121,25 +131,28 @@ qda_wkflow <- workflow() %>%
   add_recipe(titanic_recipe)
 ```
 
+There will be 30 models I am fitting, there are 10 folds for each engine and there are 3 different engine. 
 
 ### Question 5
 
 Fit each of the models created in Question 4 to the folded data.
-```{r, eval = FALSE}
+```{r}
+# logistic regression
 log_res <- log_wkflow %>% 
   fit_resamples(resamples = titanic_folds)
 ```
 
 ```{r}
+# linear discriminant
 lda_res <- lda_wkflow %>% 
   fit_resamples(resamples = titanic_folds)
 ```
 
 ```{r}
+# quadratic discriminant
 qda_res <- qda_wkflow %>% 
   fit_resamples(resamples = titanic_folds)
 ```
-
 
 
 
